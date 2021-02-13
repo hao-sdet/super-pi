@@ -101,7 +101,7 @@ $ ssh-keygen -t rsa
 ```
 $ scp /home/pi/.ssh/id_rsa.pub pi@192.168.1.N:/home/pi/<piX>.pub (where N is the target IP address, and X is the source node i.e master, pi01, pi02 , ...)
 ```
-3. Add the copied public key to authorized_keys file
+3. Add the copied public key to authorized_keys file  
 3a. Create the .ssh/authorized_keys file if not already exists
 ```
 $ touch /home/pi/.ssh/authorized_keys
