@@ -61,12 +61,12 @@ export PYTHONPATH=/home/pi/mpi4py-2.0.0
 1. Back up the master image 
 ```
 $ diskutil list
-$ sudo dd if=/dev/diskN of=~/PiSDCardBackup.dmg (where N is the target disk)
+$ sudo dd bs=1m if=/dev/rdiskN of=master-pi.dmg (where N is the target disk)
 ```
-2. Restore/Copy image to another sd card 
+2. Restore/Copy image to other sd-card 
 ```
 $ diskutil unmountDisk /dev/diskN
-$ sudo dd if=~/PiSDCardBackup.dmg of=/dev/diskN (where N is the target disk)
+$ sudo dd bs=32m if=master-pi.dmg of=/dev/rdiskN (where N is the target disk)
 ```
 
 ### Create an IP list
@@ -92,30 +92,26 @@ https://www.raspberrypi.org/documentation/configuration/tcpip/
 ```
 
 ### SSH Keys Exchange
-!We need to allow the master to connect to each node via SSH and each node to master (bidirectional) without using passwords.
-1. Generate an SSH key on master node
+!We need to allow the master node to connect to any other nodes in the cluster via SSH and each node to master (bidirectional) without using passwords. Repeat the following steps for all the nodes (including master)
+1. Generate an SSH key
 ```
 $ ssh-keygen -t rsa
 ```
-2. Copy the public key to all nodes
-!Repeat this step for all the nodes
+2. Copy SSH public key to other nodes
 ```
-$ scp /home/pi/.ssh/id_rsa.pub pi@192.168.1.N:/home/pi/master.pub (where N is the target IP address)
+$ scp /home/pi/.ssh/id_rsa.pub pi@192.168.1.N:/home/pi/<piX>.pub (where N is the target IP address, and X is the source node i.e master, pi01, pi02 , ...)
 ```
-3. Append master key to the authorized_keys file
-!Repeat this step for all the nodes
+3. Add the copied public key to authorized_keys file
+3a. Create the .ssh/authorized_keys file if not already exists
 ```
-$ ssh pi@192.168.1.N (where N is the target IP address)
-$ cat master.pub >> .ssh/authorized_keys
-```
-3a. Create the .ssh/ directory if not exists
-```
-$ mkdir /home/pi/.ssh
-$ chmod 700 /home/pi/.ssh
 $ touch /home/pi/.ssh/authorized_keys
-$ chmod 600 home/pi/.ssh/authorized_keys
+$ chmod 600 /home/pi/.ssh/authorized_keys
 ```
-4. Test key
+3b. Add other node's public key
+```
+$ cat <piX>.pub >> .ssh/authorized_keys (where X is the public key of the other node i.e master, pi01, pi02 , ...)
+```
+4. Test SSH without password
 !Repeat this step for all the nodes
 From master node
 ```
@@ -132,5 +128,5 @@ $ mpiexec -n 4 hostname
 2. Run a python script
 !Each node needs to have the same script and at the same location
 ```
-$ mpiexec --hostfile cluster -n 6 python mpi4py-2.0.0/demo/helloworld.py 
+$ mpiexec --hostfile cluster -n 6 python mpi4py-2.0.0/demo/helloworld.py
 ```

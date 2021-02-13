@@ -1,6 +1,7 @@
 # Calculating Pi with Leibniz Series
 # 1 - (1/3) + (1/5) - (1/7) + ... = pi/4
 
+# Credit to James Church
 # Source: https://gist.github.com/jcchurch/930276
 
 from mpi4py import MPI
